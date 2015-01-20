@@ -25,7 +25,7 @@ class Config {
      * @return mixed
      */
     public static function get($string){
-        static::$items = require('../config.php');
+        static::$items = require('config.php');
         $conf = explode('.',$string);
         $result = static::$items[$conf[0]];
         unset($conf[0]);
@@ -41,7 +41,7 @@ class Config {
      * @param $value
      */
     public static function set($string,$value){
-        $items = require('../config.php');
+        $items = require('config.php');
         $conf = explode('.',$string);
         $result = $items[$conf[0]];
         unset($conf[0]);
