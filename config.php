@@ -34,6 +34,11 @@ return [
         ],
     ],
 
+    'hh_parser'=>[
+        'free_url'=>'http://hh.ru/search/vacancy?clusters=true&specialization=13&area=56&page=',
+        'free_item_url'=>'http://hh.ru/vacancy/',
+    ]
+
 ];
  
   

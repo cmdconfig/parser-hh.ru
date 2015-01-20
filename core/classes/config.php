@@ -26,7 +26,6 @@ class Config {
      */
     public static function get($string){
         static::$items = require('../config.php');
-        $result = [];
         $conf = explode('.',$string);
         $result = static::$items[$conf[0]];
         unset($conf[0]);
@@ -37,6 +36,10 @@ class Config {
         return $result;
     }
 
+    /**
+     * @param $string
+     * @param $value
+     */
     public static function set($string,$value){
         $items = require('../config.php');
         $conf = explode('.',$string);

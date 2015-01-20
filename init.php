@@ -9,8 +9,13 @@
 
 include_once "core/classes/config.php";
 include_once "core/classes/proxy.php";
+include_once "app/classes/model/curl.php";
+
+
 include_once "app/classes/model/pupshevmodel.php";
+
 include_once "app/classes/parsers/hh.php";
+
 include_once "app/classes/controller/parsers.php";
 
 

@@ -12,7 +12,7 @@
 class Controller_Parsers {
 
     function __construct(){
-        return $this;
+
     }
 
 

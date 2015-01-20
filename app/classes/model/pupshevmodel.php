@@ -12,7 +12,9 @@
 namespace Model;
 
 
-abstract class PupshevModel {
+abstract class PupshevModel{
+
+    protected $data;
 
 
     function __construct(){
