@@ -81,7 +81,7 @@ class Curl {
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);
         curl_setopt($ch, CURLOPT_FAILONERROR, 1);
         curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
-        curl_setopt($ch, CURLOPT_POST, 0);
+        curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
@@ -92,8 +92,8 @@ class Curl {
         $header = curl_getinfo( $ch );
         curl_close( $ch );
 
-        $postData['agent_pass'] = '*********';
-        $header['postData'] = $postData;
+//        $postData['agent_pass'] = '*********';
+//        $header['postData'] = $postData;
         $header['errNo'] = $err;
         $header['errMsg'] = $errMsg;
         $header['content'] = $content;

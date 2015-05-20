@@ -39,6 +39,8 @@ class HH extends PupshevModel {
      */
     private $html = '';
 
+
+
     /**
      * @return HH
      */
@@ -68,14 +70,49 @@ class HH extends PupshevModel {
 
         return $result;
     }
+    private function checkLogin(){
+        echo("checkLoginr\n");
+        if(strpos($this->html,'Зарегистрироваться') > 0){
+            $this->login();
+        }
+    }
 
     /**
      * @return array
      */
     private function goPayed(){
+        $this->checkLogin();
         $result = [];
+        echo('next payed page '.date("Y-m-d H:i:s")."\r\n\r\n");
+
+        $url = Config::get('hh_parser.payed_url').$this->page;
+
+        $data = Curl::forge()->getUrl($url,$this->cookieFile);
+        $this->html = $data['content'];
+        $this->getCountPages();
+
+        for($i = 0; $i <= $this->maxPages ;$i++){
+            $list = $this->getLinks();
+
+            foreach($list as $val){
+                print_r('item free'.date("Y-m-d H:i:s")."\r\n");
+                $this->parsePayedList($val);
+                $this->runAdd();
+
+                sleep(rand(20,80));
+            }
+            if($this->countRequests < Config::get('maxRequests')){
+                $this->page = $i;
+            } else {
+                $this->page = 0;
+            }
+            $this->goFree();
+
+        }
+
 
         return $result;
+
     }
 
     /**
@@ -83,22 +120,31 @@ class HH extends PupshevModel {
      */
     private function goFree($back = false){
         $result = [];
+        echo('next free page '.date("Y-m-d H:i:s")."\r\n\r\n");
 
         $url = Config::get('hh_parser.free_url').$this->page;
 
         $data = Curl::forge()->getUrl($url,$this->cookieFile);
         $this->html = $data['content'];
-        $this->getCountFreePages();
-        for($i = 18; $i >= 0 ;$i--){
-            $list = $this->getFreeLinks();
+        $this->getCountPages();
+
+        for($i = 0; $i <= $this->maxPages ;$i++){
+            $list = $this->getLinks();
+
             foreach($list as $val){
+                print_r('item free'.date("Y-m-d H:i:s")."\r\n");
                 $this->parseFreeList($val);
                 $this->runAdd();
 
                 sleep(rand(20,80));
             }
-            $this->page = $i;
+            if($this->countRequests < Config::get('maxRequests')){
+                $this->page = $i;
+            } else {
+                $this->page = 0;
+            }
             $this->goFree();
+
         }
 
 
@@ -108,14 +154,14 @@ class HH extends PupshevModel {
     /**
      *
      */
-    private function getCountFreePages(){
+    private function getCountPages(){
         $this->maxPages = substr_count($this->html,'pager-page');
     }
 
     /**
      * @return mixed
      */
-    private function getFreeLinks(){
+    private function getLinks(){
         preg_match_all('#hh.ru/vacancy/([0-9]{1,})"#Uis',$this->html,$mch);
 
         if(!empty($mch[1])){
@@ -129,6 +175,8 @@ class HH extends PupshevModel {
      * @param int $item
      */
     private function parseFreeList($item){
+        unset($this->data);
+
         var_dump('parseFreeList');
         $url = Config::get('hh_parser.free_item_url').$item;
         $data = Curl::forge()->getUrl($url,$this->cookieFile);
@@ -185,12 +233,67 @@ class HH extends PupshevModel {
         preg_match('#datetime="(.*)\">#Uis',$html,$mch);
         $this->data['datetime'] = (!empty($mch[1]) ? trim(strip_tags($mch[1])) : '');
 
-//        var_dump($this->data);
+        $this->data['hash'] = md5(join('',$this->data));
+    }
+
+    private function parsePayedList($item){
+
+        var_dump('parsePayedList');
+        $this->checkLogin();
+        $url = Config::get('hh_parser.payed_item_url').$item;
+        $data = Curl::forge()->getUrl($url,$this->cookieFile);
+        $html = $data['content'];
+
+
+        preg_match('#birthDate" content="(.*)">#Uis',$html,$mch);
+        $this->data['birthDate'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#itemprop="gender">(.*)</strong>#Uis',$html,$mch);
+        $this->data['sex'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#itemprop="addressLocality">(.*)</strong>#Uis',$html,$mch);
+        $this->data['addressLocality'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#<span style="color:#702785">(.*)</span>#Uis',$html,$mch);
+        $this->data['addressLocality'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#itemprop="jobTitle">(.*)</div>#Uis',$html,$mch);
+        $this->data['jobTitle'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#resume__position__salary">(.*)</div>#Uis',$html,$mch);
+        $this->data['zp'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#<div class="resume__position__specialization">(.*)<ul>#Uis',$html,$mch);
+        $this->data['specialization'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#resume__position__specialization_item">(.*)</li>#Uis',$html,$mch);
+        $this->data['specializationType'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#<div>Занятость:(.*)</div>#Uis',$html,$mch);
+        $this->data['employment'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#itemtype="http://schema.org/Country"><span itemprop="name">(.*)</span>#Uis',$html,$mch);
+        $this->data['country'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#Разрешение на работу:(.*)</div>#Uis',$html,$mch);
+        $this->data['workPermit'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+        preg_match('#Желательное время в пути до работы: <span style="text-transform:lowercase">(.*)</span></div>#Uis',$html,$mch);
+        $this->data['travelTime'] = (!empty($mch[1]) ? trim($mch[1]) : '');
+
+
+
 
         $this->data['hash'] = md5(join('',$this->data));
+    }
 
-//        var_dump($this->data);
+    private function login(){
+        $postData=[
+            'username'=>Config::get('hh_parser.username'),
+            'password'=>Config::get('hh_parser.password'),
+        ];
 
-
+        $url = Config::get('hh_parser.login_url');
+        Curl::forge()->login($url,$postData,$this->cookieFile);
     }
 }

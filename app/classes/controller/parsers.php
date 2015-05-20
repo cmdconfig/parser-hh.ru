@@ -15,8 +15,10 @@ class Controller_Parsers {
 
     }
 
-
-    public function index(){
-        Parsers\HH::forge()->parse();
+    /**
+     * @param bool $payed
+     */
+    public function index($payed = false){
+        Parsers\HH::forge()->parse($payed);
     }
 }

@@ -21,4 +21,4 @@ define('COREPATH', realpath(__DIR__.'/core').DIRECTORY_SEPARATOR);
 
 
 $Parsers = new Controller_Parsers();
-$Parsers->index();
+$Parsers->index(true);

@@ -23,12 +23,19 @@ abstract class PupshevModel{
      * @var \PDO
      */
     private $db;
+    /**
+     * @var int
+     */
+    protected $countRequests = 0;
 
 
     function __construct(){
         $this->connectToBase();
     }
 
+    /**
+     *
+     */
     private function connectToBase(){
         try {
             $this->db = new \PDO(
@@ -127,19 +134,15 @@ abstract class PupshevModel{
      * @param bool $free
      */
     public function runAdd($free = true){
-//        $this->parse();
-
-
-//        die();
-//        var_dump($this->data);
         if($free){
             if($this->checkFreeBaseData() == true){
                 $this->addToBaseFree();
                 var_dump('runAdd ok');
                 unset($this->data);
+            } else {
+                $this->countRequests++;
             }
         }
-
     }
 
 
