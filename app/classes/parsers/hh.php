@@ -283,10 +283,6 @@ class HH extends PupshevModel {
 
         preg_match('#Желательное время в пути до работы: <span style="text-transform:lowercase">(.*)</span></div>#Uis',$html,$mch);
         $this->data['travelTime'] = (!empty($mch[1]) ? trim($mch[1]) : '');
-
-
-
-
         $this->data['hash'] = md5(join('',$this->data));
     }
 
