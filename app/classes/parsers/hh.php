@@ -236,6 +236,9 @@ class HH extends PupshevModel {
         $this->data['hash'] = md5(join('',$this->data));
     }
 
+    /**
+     * @param $item
+     */
     private function parsePayedList($item){
 
         var_dump('parsePayedList');
@@ -287,6 +290,9 @@ class HH extends PupshevModel {
         $this->data['hash'] = md5(join('',$this->data));
     }
 
+    /**
+     *
+     */
     private function login(){
         $postData=[
             'username'=>Config::get('hh_parser.username'),
