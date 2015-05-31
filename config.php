@@ -3,8 +3,8 @@ return [
 
     'db'=>[
         'dsn'=>'mysql:host=ps-st.ru;dbname=pupshev',
-        'user'=>'root',
-        'password'=>'g47ij0g47ij0970',
+        'user'=>'',
+        'password'=>'',
         'sql_char'=>'utf8'
     ],
 
