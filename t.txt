@@ -1,0 +1,39 @@
+server {
+        listen   80;
+        root /home/example/www;
+
+        access_log  /home/example/logs/nginx.access.log; #расположение логов данного хоста
+
+        server_name example.org www.example.org;
+
+        location / {
+                index index.php index.html index.htm;
+        }
+
+        location ~ \.php$ {
+                fastcgi_pass   127.0.0.1:9000;
+                fastcgi_index  index.php;
+                fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+                include        fastcgi_params;
+        }
+       #Работа с phpMyAdmin
+         location /phpmyadmin {
+               root /usr/share/;
+               index index.php index.html index.htm;
+               location ~ ^/phpmyadmin/(.+\.php)$ {
+                       try_files $uri =404;
+                       root /usr/share/;
+                       fastcgi_pass 127.0.0.1:9000;
+                       fastcgi_index index.php;
+                       fastcgi_param SCRIPT_FILENAME $request_filename;
+                       include /etc/nginx/fastcgi_params;
+               }
+               location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+                       root /usr/share/;
+               }
+        }
+        location /phpMyAdmin {
+               rewrite ^/* /phpmyadmin last;
+        }
+
+}
